@@ -14,11 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> master
 
 #include <iostream>
 #include <vector>
@@ -156,7 +152,6 @@ void vectrx2020_serialize(vector<dvg_vec> out_points_buff, uint8_t** out_meta_bu
 	vector<uint8_t> out_meta_points;
 	vector<uint8_t> out_packed_pnts;
 
-<<<<<<< HEAD
 	<<<<<< < HEAD
 		int cmd = FLAG_COMPLETE;
 	string header = "$cmd" + to_string(cmd) + " ";
@@ -166,11 +161,6 @@ void vectrx2020_serialize(vector<dvg_vec> out_points_buff, uint8_t** out_meta_bu
 	out_meta_points.assign(c_header, c_header + SIZEOF_HEADER);
 	>>>>>> > inlined(no intermittant buffers)
 		uint32_t out_bit_iter = 0;
-=======
-	c_header[4] = FLAG_COMPLETE;
-	out_meta_points.assign(c_header, c_header + SIZEOF_HEADER);
-	uint32_t out_bit_iter = 0;
->>>>>>> master
 	uint8_t meta_byte = 0;
 	uint8_t meta_out_points_size[4];
 
@@ -186,11 +176,7 @@ void vectrx2020_serialize(vector<dvg_vec> out_points_buff, uint8_t** out_meta_bu
 			out_packed_pnts.push_back(m_ar[0]); // b
 		}
 
-<<<<<<< HEAD
 		if (!(out_bit_iter % 8) && out_bit_iter)
-=======
-		if (!(out_bit_iter % 8) && out_bit_iter) 
->>>>>>> master
 			out_meta_points.push_back(meta_byte);
 
 		meta_byte |= pnt.colors.color << (out_bit_iter % 8);
@@ -229,19 +215,13 @@ int vectrx2020_deserialize_points(uint8_t* in_packed_points_buff, uint32_t cnt, 
 		cnt += 3;
 		in_packed_points_buff += 3;
 	}
-<<<<<<< HEAD
 	<<<<<< < HEAD
 
 		point.pnt.y = ((*(in_packed_points_buff + 1) & 0xF0) << 4) + *(in_packed_points_buff);
-=======
-
-	point.pnt.y = ((*(in_packed_points_buff + 1) & 0xF0) << 4) + *(in_packed_points_buff);
->>>>>>> master
 	point.pnt.x = ((*(in_packed_points_buff + 2) & 0x0F) << 8) + ((*(in_packed_points_buff + 2) & 0xF0) >> 4) + ((*(in_packed_points_buff + 1) & 0x0F) << 4);
 	cnt += 3;
 	in_packed_points_buff += 3;
 
-<<<<<<< HEAD
 	====== =
 
 		point.pnt.y = ((*(in_packed_points_buff + 1) & 0xF0) << 4) + *(in_packed_points_buff);
@@ -252,10 +232,6 @@ int vectrx2020_deserialize_points(uint8_t* in_packed_points_buff, uint32_t cnt, 
 	>>>>>> > inlined(no intermittant buffers)
 		//DO SOMETHING
 		printf("with_color=%x x=%x y=%x r=%x g=%x b=%x \n\r", point.colors.color, (point.pnt.x), point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
-=======
-	//DO SOMETHING
-	printf("with_color=%x x=%x y=%x r=%x g=%x b=%x \n\r", point.colors.color, (point.pnt.x), point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
->>>>>>> master
 	//OR STORE
 	//in_points.push_back(point);
 	return cnt;
@@ -294,7 +270,3 @@ void vectrx2020_deserialize(uint8_t* in_meta_buff, uint8_t* in_packed_points_buf
 	in_packed_points_buff = start_points_buff;
 }
 
-<<<<<<< HEAD
-=======
- 
->>>>>>> master
