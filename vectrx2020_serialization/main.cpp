@@ -12,7 +12,6 @@
 
 
 
-
 #ifdef __GNUC__
 #define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
 #endif
@@ -23,6 +22,9 @@
 #define SIZEOF_LEN 4
 #define SIZEOF_HEADER 6
 #define FLAG_COMPLETE 4
+#define NUM_POINTS 20
+
+
 using namespace std;
 
 
@@ -84,7 +86,13 @@ uint64_t rand64(void)
 {
 	return rand() ^ ((uint64_t)rand() << 15) ^ ((uint64_t)rand() << 30) ^ ((uint64_t)rand() << 45) ^ ((uint64_t)rand() << 60);
 }
-#define NUM_POINTS 20
+
+
+uint8_t* out_meta_buff;
+uint8_t* out_packed_points_buff;
+void vectrx2020_serialize(vector<dvg_vec> out_points_buff, uint8_t** out_meta_buff, uint8_t** out_packed_points_buff);
+void vectrx2020_deserialize(uint8_t* in_meta_buff, uint8_t* in_packed_points_buff);
+
 int main()
 {
 	dvg_vec dvec = { 0 };
@@ -113,7 +121,17 @@ int main()
 		printf("with_color=%x x=%x y=%x r=%x g=%x b=%x \n\r", point.colors.color, point.pnt.x, point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
 	}
 
-	//serialize
+
+	vectrx2020_serialize(out_points_buff ,&out_meta_buff, &out_packed_points_buff);
+	vectrx2020_deserialize(out_meta_buff, out_packed_points_buff);
+
+	free(out_meta_buff);
+		free(out_packed_points_buff);
+}
+
+
+void vectrx2020_serialize(vector<dvg_vec> out_points_buff , uint8_t** out_meta_buff , uint8_t** out_packed_points_buff) {
+
 	printf("sending size: %lli\n\r", out_points_buff.size());
 
 	vector<uint8_t> out_meta_points;
@@ -160,29 +178,20 @@ int main()
 
 	for (int i = 3; i >= 0; i--)
 		out_meta_points.insert(out_meta_points.begin() + SIZEOF_HEADER, meta_out_points_size[i]);
+	 
 
-	uint8_t* out_meta_buff = out_meta_points.data();
-	uint8_t* out_packed_points_buff = out_packed_pnts.data();
-	uint32_t out_meta_size = out_meta_points.size();
+	*out_meta_buff  = (uint8_t*)malloc(out_meta_points.size() * sizeof(uint8_t));
+	*out_packed_points_buff = (uint8_t*)malloc(out_packed_pnts.size() * sizeof(uint8_t));
+ 
+	memcpy(*out_meta_buff, (uint8_t*)out_meta_points.data(), out_meta_points.size());
+	memcpy(*out_packed_points_buff, (uint8_t*)out_packed_pnts.data(),  out_packed_pnts.size());
 
-	//transfer
+}
 
-	uint8_t* in_meta_buff = NULL;
-	uint8_t* in_packed_points_buff = NULL;
-
-	if (out_packed_size) {
-		in_packed_points_buff = (uint8_t*)malloc(out_packed_size);
-		memcpy(in_packed_points_buff, out_packed_points_buff, out_packed_size);
-	}
-	if (out_meta_size) {
-		in_meta_buff = (uint8_t*)malloc(out_meta_size);
-		memcpy(in_meta_buff, out_meta_buff, out_meta_size);
-	}
-
-	//deserialize
+void vectrx2020_deserialize(uint8_t* in_meta_buff ,uint8_t* in_packed_points_buff ){
 
 	uint32_t int_bit_iter = 0;
-
+	uint8_t meta_byte=0;
 	uint32_t with_color_size = 0;
 	vector<dvg_vec> in_points;
 	bool with_color[NUM_POINTS] = { 0 };
@@ -192,7 +201,7 @@ int main()
 
 	for (byte_iter = 0; byte_iter < in_p_size - 8; byte_iter += 8)
 	{
-		uint8_t meta_byte = *(in_meta_buff + (SIZEOF_HEADER + SIZEOF_LEN) + byte_iter / 8);
+		 meta_byte = *(in_meta_buff + (SIZEOF_HEADER + SIZEOF_LEN) + byte_iter / 8);
 		for (int_bit_iter = 0; int_bit_iter < 8; int_bit_iter++) {
 			uint8_t bit = 1 & meta_byte >> int_bit_iter;
 			with_color[int_bit_iter + byte_iter] = (bit);
@@ -201,7 +210,7 @@ int main()
 	}
 
 	if (in_p_size % 8)
-		uint8_t meta_byte = *(in_meta_buff + (SIZEOF_HEADER + SIZEOF_LEN + 1) + byte_iter / 8);
+		 meta_byte = *(in_meta_buff + (SIZEOF_HEADER + SIZEOF_LEN + 1) + byte_iter / 8);
 
 	for (int_bit_iter = 0; int_bit_iter < in_p_size % 8; int_bit_iter++) {
 		uint8_t bit = 1 & meta_byte >> int_bit_iter;
@@ -243,15 +252,6 @@ int main()
 			//in_points.push_back(point);
 		}
 
-		if (in_p_size) {
-			free(start_points_buff);
-			in_packed_points_buff = NULL;
-			start_points_buff = NULL;
-		}
-		if (in_meta_buff) {
-			free(in_meta_buff);
-			in_meta_buff = NULL;
-		}
 
 	//	for (dvg_vec& pnt : in_points)
 	//	{
@@ -260,5 +260,7 @@ int main()
 	//	printf("results size: %lli\n\r", in_points.size());
 
 	}
+
+	in_packed_points_buff = start_points_buff;
 
 }
