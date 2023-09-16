@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * This file is part of the vectrx2020 distribution (https://github.com/claydonkey/vectrx2020).
  * Copyright (c) 2023 Anthony Campbell
@@ -14,6 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+=======
+// ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+>>>>>>> origin/master
 
 #include <iostream>
 #include <vector>
@@ -21,8 +26,14 @@
 #include <iostream>
 #include <string> 
 
+<<<<<<< HEAD
 #include <stdio.h>
 #include <string.h>
+=======
+
+
+
+>>>>>>> origin/master
 
 #ifdef __GNUC__
 #define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
@@ -84,7 +95,17 @@ void int32ToByte(uint8_t a[], uint32_t n) {
 	memcpy(a, &n, 4);
 
 }
+<<<<<<< HEAD
 
+=======
+void Vecint64ToVecByte(uint8_t a[], uint64_t n) {
+	memcpy(a, &n, 8);
+	n = n >> 32;
+	memcpy(a + 3, &n, 4);
+	// n = n >> 16;
+	// memcpy(a + 4, &n, 3);
+}
+>>>>>>> origin/master
 
 uint64_t rand64(void)
 {
@@ -134,6 +155,10 @@ int main()
 
 	for (dvg_vec& pnt : out_points)
 	{
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 		uint8_t m_ar[8];
 
 		int64ToByte(m_ar, pnt.val);
@@ -158,7 +183,11 @@ int main()
 	out_meta_points.push_back(meta_byte);
 
 	uint8_t out_points_size[4];
+<<<<<<< HEAD
 	uint32_t out_p_size = out_points.size();
+=======
+	size_t out_p_size = out_points.size();
+>>>>>>> origin/master
 
 	int32ToByte(out_points_size, out_p_size);
 
@@ -167,6 +196,7 @@ int main()
 
 	uint8_t* out_meta_buff = out_meta_points.data();
 	uint8_t* out_points_buff = out_m_crunched_pnts.data();
+<<<<<<< HEAD
 	uint32_t out_meta_size = out_meta_points.size();
 
 	//transfer
@@ -182,12 +212,16 @@ int main()
 		in_meta_buff = (uint8_t*)malloc(out_meta_size);
 		memcpy(in_meta_buff, out_meta_buff, out_meta_size);
 	}
+=======
+
+>>>>>>> origin/master
 
 	//deserialize
 
 	uint32_t int_bit_iter = 0;
 	uint32_t in_p_size;
 	uint32_t with_color_size = 0;
+<<<<<<< HEAD
 //	vector<dvg_vec> in_points;
 	bool with_color[NUM_POINTS] = { 0 };
 	int byte_iter;
@@ -265,4 +299,65 @@ int main()
 	
 
 		
+=======
+	vector<dvg_vec> in_points;
+	bool with_color[NUM_POINTS] = { 0 };
+	int byte_iter;
+
+	ByteToint32(out_meta_buff + +SIZEOF_HEADER, &in_p_size);
+
+	for (byte_iter = 0; byte_iter < in_p_size - 8; byte_iter += 8)
+	{
+		uint8_t meta_byte = *(out_meta_buff + (SIZEOF_HEADER + SIZEOF_LEN) + byte_iter / 8);
+		for (int_bit_iter = 0; int_bit_iter < 8; int_bit_iter++) {
+			uint8_t bit = 1 & meta_byte >> int_bit_iter;
+			with_color[int_bit_iter + byte_iter] = (bit);
+			with_color_size++;
+		}
+	}
+
+	if (in_p_size % 8)
+		uint8_t meta_byte = *(out_meta_buff + (SIZEOF_HEADER + SIZEOF_LEN + 1) + byte_iter / 8);
+
+	for (int_bit_iter = 0; int_bit_iter < in_p_size % 8; int_bit_iter++) {
+		uint8_t bit = 1 & meta_byte >> int_bit_iter;
+		with_color[int_bit_iter + byte_iter] = (bit);
+		with_color_size++;
+	}
+	if (with_color_size != in_p_size)
+		printf("error\n\r");
+
+
+
+	for (int pts = 0; pts < with_color_size; pts++)
+	{
+		dvg_vec point;
+		point.colors.color = with_color[pts];
+		point.pnt.r = 0;
+		point.pnt.g = 0;
+		point.pnt.b = 0;
+
+		if (point.colors.color)
+		{
+			point.pnt.r = *(out_points_buff);
+			point.pnt.g = *(out_points_buff + 1);
+			point.pnt.b = *(out_points_buff + 2);
+
+			out_points_buff += 3;
+		}
+
+		point.pnt.y = ((*(out_points_buff + 1) & 0xF0) << 4) + *(out_points_buff);
+		point.pnt.x = ((*(out_points_buff + 2) & 0x0F) << 8) + ((*(out_points_buff + 2) & 0xF0) >> 4) + ((*(out_points_buff + 1) & 0x0F) << 4);
+
+		out_points_buff += 3;
+		in_points.push_back(point);
+	}
+
+	for (dvg_vec& pnt : in_points)
+	{
+		printf("with_color=%x x=%x y=%x r=%x g=%x b=%x \n\r", pnt.colors.color, (pnt.pnt.x), pnt.pnt.y, pnt.pnt.r, pnt.pnt.g, pnt.pnt.b);
+	}
+	printf("results size: %lli\n\r", in_points.size());
+
+>>>>>>> origin/master
 }
