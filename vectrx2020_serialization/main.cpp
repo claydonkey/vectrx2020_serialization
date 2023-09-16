@@ -73,7 +73,13 @@ void int32ToByte(uint8_t a[], uint32_t n) {
 	memcpy(a, &n, 4);
 
 }
- 
+void Vecint64ToVecByte(uint8_t a[], uint64_t n) {
+	memcpy(a, &n, 8);
+	n = n >> 32;
+	memcpy(a + 3, &n, 4);
+	// n = n >> 16;
+	// memcpy(a + 4, &n, 3);
+}
 
 
 uint64_t rand64(void)
