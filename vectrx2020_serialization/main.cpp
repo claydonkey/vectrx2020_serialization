@@ -112,8 +112,8 @@ int main()
 {
 	dvg_vec dvec = { 0 };
 
-	dvec.pnt.x = 0xBAC;
-	dvec.pnt.y = 0xFAF;
+	dvec.pnt.x = 3840;
+	dvec.pnt.y = 3840;
 	dvec.pnt.r = 0xAA;
 	dvec.pnt.g = 0xBB;
 	dvec.pnt.b = 0xCC;
@@ -126,14 +126,14 @@ int main()
 	for (int i = 0; i < NUM_POINTS; i++)
 	{
 		dvg_vec point = { 0 };
-		//	point.val = dvec.val; // rand64();
-		point.val = rand64();
+		 point.val = dvec.val; // rand64();
+		//point.val = rand64();
 		point.colors.color = (!(i % 2)) ? false : true;
 		if (!point.colors.color)
 			point.colors.rgb = 0;
 
 		out_points_buff.push_back(point);
-		printf("with_color=%x x=%x y=%x r=%x g=%x b=%x \n\r", point.colors.color, point.pnt.x, point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
+		printf("with_color=%u x=%u y=%u r=%u g=%u b=%u \n\r", point.colors.color, point.pnt.x, point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
 	}
 
 
@@ -152,14 +152,8 @@ void vectrx2020_serialize(vector<dvg_vec> out_points_buff, uint8_t** out_meta_bu
 	vector<uint8_t> out_meta_points;
 	vector<uint8_t> out_packed_pnts;
 
-	<<<<<< < HEAD
-		int cmd = FLAG_COMPLETE;
-	string header = "$cmd" + to_string(cmd) + " ";
-	std::move(std::begin(header), std::end(header), std::back_inserter(out_meta_points));
-	====== =
 		c_header[4] = FLAG_COMPLETE;
 	out_meta_points.assign(c_header, c_header + SIZEOF_HEADER);
-	>>>>>> > inlined(no intermittant buffers)
 		uint32_t out_bit_iter = 0;
 	uint8_t meta_byte = 0;
 	uint8_t meta_out_points_size[4];
@@ -215,23 +209,16 @@ int vectrx2020_deserialize_points(uint8_t* in_packed_points_buff, uint32_t cnt, 
 		cnt += 3;
 		in_packed_points_buff += 3;
 	}
-	<<<<<< < HEAD
+
 
 		point.pnt.y = ((*(in_packed_points_buff + 1) & 0xF0) << 4) + *(in_packed_points_buff);
 	point.pnt.x = ((*(in_packed_points_buff + 2) & 0x0F) << 8) + ((*(in_packed_points_buff + 2) & 0xF0) >> 4) + ((*(in_packed_points_buff + 1) & 0x0F) << 4);
 	cnt += 3;
 	in_packed_points_buff += 3;
 
-	====== =
-
-		point.pnt.y = ((*(in_packed_points_buff + 1) & 0xF0) << 4) + *(in_packed_points_buff);
-	point.pnt.x = ((*(in_packed_points_buff + 2) & 0x0F) << 8) + ((*(in_packed_points_buff + 2) & 0xF0) >> 4) + ((*(in_packed_points_buff + 1) & 0x0F) << 4);
-	cnt += 3;
-	in_packed_points_buff += 3;
-
-	>>>>>> > inlined(no intermittant buffers)
+	
 		//DO SOMETHING
-		printf("with_color=%x x=%x y=%x r=%x g=%x b=%x \n\r", point.colors.color, (point.pnt.x), point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
+		printf("with_color=%u x=%u y=%u r=%u g=%u b=%u \n\r", point.colors.color, (point.pnt.x), point.pnt.y, point.pnt.r, point.pnt.g, point.pnt.b);
 	//OR STORE
 	//in_points.push_back(point);
 	return cnt;
